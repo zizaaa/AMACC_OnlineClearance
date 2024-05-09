@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App\Customs\Services\EmailVerificationService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrationRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ResendEmailVerificationLinkRequest;
+use App\Http\Requests\VerifyEmailRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
+    public function __construct(private EmailVerificationService $service)
+    {
+        
+    }
     /**
      * Login
      */
@@ -27,6 +34,20 @@ class AuthController extends Controller
     }
 
     /**
+     * resend verification link
+     */
+    public function resendEmailVerificationLink(ResendEmailVerificationLinkRequest $request){
+        return $this->service->resendLink($request->email);
+    }
+
+    /**
+     * verify user email
+     */
+    public function verifyUserEmail(VerifyEmailRequest $request){
+        return $this->service->verifyEmail($request->email, $request->token);
+    }
+
+    /**
      * Registration
      */
     public function registration(RegistrationRequest $request)
@@ -34,6 +55,7 @@ class AuthController extends Controller
         $user = User::create($request->validated());
             
             if($user){
+                $this->service->sendVerificationLink($user);
                 $token = auth()->login($user);
                 return $this->responseWithToken($token, $user);
             }else{

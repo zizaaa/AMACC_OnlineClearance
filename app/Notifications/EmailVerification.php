@@ -37,8 +37,8 @@ class EmailVerification extends Notification
     {
         return (new MailMessage)
                     ->subject('Verify Email Address')
-                    ->line("Dear $notifiable->name")
-                    ->line('The introduction to the notification.')
+                    ->line("$notifiable->name")
+                    ->line('Thank you for registering in AMACC Naga Online Clearance! Please verify your email address by clicking the link below.')
                     ->action('Verify email', $this->url)
                     ->line("If you didn't create an account, no further action is required");
     }
